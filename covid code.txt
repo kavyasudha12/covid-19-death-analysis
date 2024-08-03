@@ -1,0 +1,78 @@
+import pandas as pd
+Covid_Data = pd.read_csv("coviddata.csv.zip")
+Covid_Data
+Covid_Data.isnull().sum()
+Covid_Data_Cleaned = Covid_Data.drop(columns = ["Total Boosters per Hundred", "Total Boosters", "Location", "Id"])
+Covid_Data_Cleaned
+mean_Total_Vaccinations = Covid_Data_Cleaned['Total Vaccinations'].mean()
+print(mean_Total_Vaccinations)
+
+mean_People_Vaccinated = Covid_Data_Cleaned['People Vaccinated'].mean()
+print(mean_People_Vaccinated)
+
+mean_People_Fully_Vaccinated = Covid_Data_Cleaned['People Fully Vaccinated'].mean()
+print(mean_People_Fully_Vaccinated)
+
+mean_Daily_Vaccinations = Covid_Data_Cleaned['Daily Vaccinations'].mean()
+print(mean_Daily_Vaccinations)
+
+mean_Total_Vaccinations_per_Hundred = Covid_Data_Cleaned['Total Vaccinations per Hundred'].mean()
+print(mean_Total_Vaccinations_per_Hundred)
+
+mean_People_Vaccinated_per_Hundred = Covid_Data_Cleaned['People Vaccinated per Hundred'].mean()
+print(mean_People_Vaccinated_per_Hundred)
+
+mean_People_Fully_Vaccinated_per_Hundred = Covid_Data_Cleaned['People Fully Vaccinated per Hundred'].mean()
+print(mean_People_Fully_Vaccinated_per_Hundred)
+
+mean_Daily_Vaccinations_per_Hundred = Covid_Data_Cleaned['Daily Vaccinations per Hundred'].mean()
+print(mean_Daily_Vaccinations_per_Hundred)
+
+mean_Daily_People_Vaccinated = Covid_Data_Cleaned['Daily People Vaccinated'].mean()
+print(mean_Daily_People_Vaccinated)
+
+mean_Daily_People_Vaccinated_per_Hundred = Covid_Data_Cleaned['Daily People Vaccinated per Hundred'].mean()
+print(mean_Daily_People_Vaccinated_per_Hundred)
+
+mean_Weekly_Cases= Covid_Data_Cleaned['Weekly Cases'].mean()
+print(mean_Weekly_Cases)
+
+mean_Weekly_Cases_per_Million = Covid_Data_Cleaned['Weekly Cases per Million'].mean()
+print(mean_Weekly_Cases_per_Million)
+
+mean_Weekly_Deaths = Covid_Data_Cleaned['Weekly Deaths'].mean()
+print(mean_Weekly_Deaths)
+
+mean_Weekly_Deaths_per_Million  = Covid_Data_Cleaned['Weekly Deaths per Million'].mean()
+print(mean_Weekly_Deaths_per_Million)
+
+Covid_Data_Cleaned.isnull().sum()
+import seaborn as sns
+sns.displot(Covid_Data_Cleaned['Weekly Cases per Million'])
+sns.displot(Covid_Data_Cleaned['Weekly Deaths per Million']); 
+Covid_Data_Cleaned.groupby('Year').agg('mean')[['Weekly_Deaths', 'Weekly_Cases']].plot(kind='bar',
+                                                           figsize=(20, 10),
+                                                           stacked=True)
+#Getting them to a fixed range.
+Covid_Data_Cleaned.Weekly_Cases = (Covid_Data_Cleaned.Weekly_Cases-min(Covid_Data_Cleaned.Weekly_Cases))/(max(Covid_Data_Cleaned.Weekly_Cases)-min(Covid_Data_Cleaned.Weekly_Cases))
+Covid_Data_Cleaned.Weekly_Deaths = (Covid_Data_Cleaned.Weekly_Deaths-min(Covid_Data_Cleaned.Weekly_Deaths))/(max(Covid_Data_Cleaned.Weekly_Deaths)-min(Covid_Data_Cleaned.Weekly_Deaths))
+Covid_Data_Cleaned.Total_Vaccinations = (Covid_Data_Cleaned.Total_Vaccinations-min(Covid_Data_Cleaned.Total_Vaccinations))/(max(Covid_Data_Cleaned.Total_Vaccinations)-min(Covid_Data_Cleaned.Total_Vaccinations))
+Covid_Data_Cleaned.People_Vaccinated = (Covid_Data_Cleaned.People_Vaccinated-min(Covid_Data_Cleaned.People_Vaccinated))/(max(Covid_Data_Cleaned.People_Vaccinated)-min(Covid_Data_Cleaned.People_Vaccinated))
+Covid_Data_Cleaned.People_Fully_Vaccinated = (Covid_Data_Cleaned.People_Fully_Vaccinated-min(Covid_Data_Cleaned.People_Fully_Vaccinated))/(max(Covid_Data_Cleaned.People_Fully_Vaccinated)-min(Covid_Data_Cleaned.People_Fully_Vaccinated))
+Covid_Data_Cleaned.Daily_Vaccinations = (Covid_Data_Cleaned.Daily_Vaccinations-min(Covid_Data_Cleaned.Daily_Vaccinations))/(max(Covid_Data_Cleaned.Daily_Vaccinations)-min(Covid_Data_Cleaned.Daily_Vaccinations))
+Covid_Data_Cleaned.Daily_People_Vaccinated = (Covid_Data_Cleaned.Daily_People_Vaccinated-min(Covid_Data_Cleaned.Daily_People_Vaccinated))/(max(Covid_Data_Cleaned.Daily_People_Vaccinated)-min(Covid_Data_Cleaned.Daily_People_Vaccinated))
+Covid_Data_Cleaned.describe()
+Covid_Data_Cleaned
+from sklearn.model_selection import train_test_split    
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_train, X_test, y_train, y_test = train_test_split(Covid_Data_Cleaned.drop(['Weekly_Deaths'], axis=1), Covid_Data_Cleaned.Weekly_Deaths, test_size= 0.2, random_state=0)
+from sklearn import datasets, linear_model, metrics
+reg = linear_model.LinearRegression()
+reg.fit(X_train, y_train)
+print(reg.intercept_)
+print(reg.coef_)
+y_pred = reg.predict(X_test)
+Covid_Data_Cleaned = pd.DataFrame({'Actual': y_test.values.flatten(), 
+                                   'Predicted': y_pred.flatten()})
+Covid_Data_Cleaned
